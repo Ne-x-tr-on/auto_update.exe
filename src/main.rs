@@ -1,14 +1,8 @@
 use std::fs::File;
 use std::io::{copy, Cursor};
-
 use reqwest::Client;
 use semver::Version;
-
 use serde::Deserialize;
-
-// Git Release Model
-// use std::fs::File;
-// use std::io::copy;
 
 // Current Version
 const CURRENT_VERSION: &str = "0.1.0";
@@ -25,23 +19,6 @@ struct GitHubAsset {
     name: String,
     browser_download_url: String,
 }
-
-// Download Updates
-async fn download_update(url: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let response = reqwest::get(url).await?;
-
-    let bytes = response.bytes().await?; // Own the data
-    let mut reader = Cursor::new(bytes);
-
-    let mut file = File::create("update.bin")?;
-    copy(&mut reader, &mut file)?;
-
-    Ok(())
-}
-
-
-// use reqwest::Client;
-// use semver::Version;
 
 async fn check_for_update() -> Result<Option<String>, Box<dyn std::error::Error>> {
     let client = Client::new();
@@ -70,8 +47,18 @@ async fn check_for_update() -> Result<Option<String>, Box<dyn std::error::Error>
     Ok(None)
 }
 
+// Download Updates
+async fn download_update(url: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let response = reqwest::get(url).await?;
 
+    let bytes = response.bytes().await?; // Own the data
+    let mut reader = Cursor::new(bytes);
 
+    let mut file = File::create("update.bin")?;
+    copy(&mut reader, &mut file)?;
+
+    Ok(())
+}
 
 #[tokio::main]
 async fn main() {
